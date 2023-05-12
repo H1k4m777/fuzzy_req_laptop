@@ -2,6 +2,7 @@
 function hitung_keanggotaan($x, $sebentar, $sedang, $lama)
 {
     $keanggotaan = array();
+
     // Himpunan 'sebentar'
     if ($x <= $sebentar[0]) {
         $keanggotaan['sebentar'] = 1;
@@ -62,11 +63,21 @@ $keanggotaan_office = hitung_keanggotaan(7.5, $kategori['office']['sebentar'], $
 $keanggotaan_editing = hitung_keanggotaan(0, $kategori['editing']['sebentar'], $kategori['editing']['sedang'], $kategori['editing']['lama']);
 $keanggotaan_programming = hitung_keanggotaan(2.5, $kategori['programming']['sebentar'], $kategori['programming']['sedang'], $kategori['programming']['lama']);
 
+echo "Game: ";
 print_r($keanggotaan_game);
 echo "<br>";
+
+echo "Office: ";
 print_r($keanggotaan_office);
 echo "<br>";
+
+echo "editing: ";
 print_r($keanggotaan_editing);
 echo "<br>";
+
+echo "programming: ";
 print_r($keanggotaan_programming);
 echo "<br>";
+
+$himpunan_terpilih = array_search(max($keanggotaan_game), $keanggotaan_game);
+echo "Nilai x termasuk dalam himpunan '$himpunan_terpilih' dengan tingkat keanggotaannya sebesar: " . max($keanggotaan_game);
