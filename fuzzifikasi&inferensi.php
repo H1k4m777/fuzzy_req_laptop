@@ -1,4 +1,20 @@
 <?php
+
+// Mengatur koneksi ke database
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "test";
+
+// Membuat koneksi
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Memeriksa koneksi
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+    echo "g konek";
+}
+
 //fungsi fuzzifikasi
 function fuzzifikasi($x, $sebentar, $sedang, $lama)
 {
@@ -83,45 +99,34 @@ echo "fuzzyfikasi X Programming:\n";
 var_dump($hitungx_programming);
 echo "\n";
 
-//HASIL FUNGSI INFERENSI
-echo "hasil inferensi:\n";
-$durasi = ['xsebentar', 'xsedang', 'xlama'];
-// Buat array untuk menyimpan hasil dan kombinasi nilai
-$results = [];
-//melakukan perulangan dengan pemanggilan untuk fungsi inferensi() dari berbagai kombinasi 
-foreach ($durasi as $gameCategory) {
-    foreach ($durasi as $editingCategory) {
-        foreach ($durasi as $officeCategory) {
-            foreach ($durasi as $programmingCategory) {
-                //memeriksa apakah sebuah index ada, jika tidak di set 0
+// Memperbarui kolom "nilai" di setiap baris tabel dengan hasil inferensi yang sesuai
+//$stmt = $conn->prepare("UPDATE tabel_inferensi SET nilai = ? WHERE id = ?");
+
+$categories = ['xsebentar', 'xsedang', 'xlama'];
+$counter = 1;
+
+foreach ($categories as $gameCategory) {
+    foreach ($categories as $editingCategory) {
+        foreach ($categories as $officeCategory) {
+            foreach ($categories as $programmingCategory) {
                 $gameValue = isset($hitungx_game[$gameCategory]) ? $hitungx_game[$gameCategory] : 0;
                 $editingValue = isset($hitungx_editing[$editingCategory]) ? $hitungx_editing[$editingCategory] : 0;
                 $officeValue = isset($hitungx_office[$officeCategory]) ? $hitungx_office[$officeCategory] : 0;
                 $programmingValue = isset($hitungx_programming[$programmingCategory]) ? $hitungx_programming[$programmingCategory] : 0;
-                //memanggil fungsi inferensi
-                $result = inferensi($gameValue, $editingValue, $officeValue, $programmingValue);
-                //untuk menampilkan hasil inferensi beserta kombinasi dari kategorinya
-                $combination = "$gameCategory,$editingCategory,$officeCategory,$programmingCategory";
-                //echo "$combination : $result\n";
-                $results[] = [$combination, $result];
+
+                $nilai = round(inferensi($gameValue, $editingValue, $officeValue, $programmingValue), 2);
+                //echo $counter . ":" . $nilai . "<br>";
+
+                $sql = "UPDATE tabel_inferensi SET nilai = $nilai WHERE id = $counter";
+                if (mysqli_query($conn, $sql)) {
+                    echo "Record updated successfully";
+                } else {
+                    echo "Error updating record: " . mysqli_error($conn);
+                }
+                $counter++;
             }
         }
     }
 }
 
-// Buat file CSV
-$filename = 'output.csv';
-$file = fopen($filename, 'w');
-
-// Tulis header kolom
-fputcsv($file, ['Kombinasi Nilai', 'Hasil Inferensi']);
-
-// Tulis data
-foreach ($results as $row) {
-    fputcsv($file, $row);
-}
-
-// Tutup file
-fclose($file);
-
-echo "Tabel CSV berhasil dibuat dengan nama file: $filename";
+mysqli_close($conn);
